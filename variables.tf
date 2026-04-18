@@ -22,7 +22,6 @@ variable "vm_names" {
   default = [
     "control-node",
     "vm1-web",
-    "vm2-db",
-    "vm3-extra"
+    "vm2-db"
   ]
 }
