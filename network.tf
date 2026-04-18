@@ -18,4 +18,10 @@ resource "azurerm_subnet" "subnet" {
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = var.subnet_address_space
+
+  # Se añade porque terraform intenta cargar todo muy rapido y da error de que la red virtual todavía no existe
+  depends_on = [
+    azurerm_virtual_network.vnet
+  ]
 }
+
