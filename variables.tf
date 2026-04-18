@@ -4,7 +4,7 @@ variable "location" {
 }
 
 variable "resource_group_name" {
-  default = "rg-tfstate"
+  default = "rg-asr-terraform"
 }
 
 variable "vnet_address_space" {
