@@ -1,6 +1,6 @@
 variable "location" {
   description = "Región de Azure"
-  default     = "Sweden_Central"
+  default     = "swedencentral"
 }
 
 variable "resource_group_name" {
