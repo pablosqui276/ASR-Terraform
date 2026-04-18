@@ -1,8 +1,11 @@
 # Guardamos la configuración de la máquina virtual en este archivo vm.tf
+# Utilizamos for each para crear 4 máquina con los nombres de variables.tf
 
 # IP pública estática
 resource "azurerm_public_ip" "public_ip" {
-    name                = "pip-asr-terraform"
+    for_each            = toset(var.vm_names)
+
+    name                = "pip-asr-${each.key}"
     location            = azurerm_resource_group.rg.location
     resource_group_name = azurerm_resource_group.rg.name
     allocation_method   = "Static"
@@ -11,22 +14,26 @@ resource "azurerm_public_ip" "public_ip" {
 
 # Interfaz de red que conecta la VM a la subnet (le asigna la IP pública)
 resource "azurerm_network_interface" "nic" {
-    name                = "nic-asr-terraform"
+    for_each            = toset(var.vm_names)
+
+    name                = "nic-asr-${each.key}"
     location            = azurerm_resource_group.rg.location
     resource_group_name = azurerm_resource_group.rg.name
 
     ip_configuration {
-        name                          = "internal"
+        name                          = "internal-${each.key}"
         subnet_id                     = azurerm_subnet.subnet.id
         # La IP privada dentro de la subnet se asigna automáticamente
         private_ip_address_allocation = "Dynamic"
-        public_ip_address_id          = azurerm_public_ip.public_ip.id
+        public_ip_address_id          = azurerm_public_ip.public_ip[each.key].id
     }
 }
 
 # Máquina virtual Linux (Ubuntu 22.04 LTS)
 resource "azurerm_linux_virtual_machine" "vm" {
-    name                = "vm-asr-terraform"
+    for_each            = toset(var.vm_names)
+
+    name                = "${each.key}"
     resource_group_name = azurerm_resource_group.rg.name
     location            = azurerm_resource_group.rg.location
     # Tamaño mínimo: 1 vCPU, 1GB RAM
@@ -35,7 +42,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
 
     # Asociamos la interfaz de red definida arriba
     network_interface_ids = [
-        azurerm_network_interface.nic.id
+        azurerm_network_interface.nic[each.key].id
     ]
 
     # Autenticación por clave SSH
